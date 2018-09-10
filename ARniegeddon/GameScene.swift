@@ -39,6 +39,7 @@ class GameScene: SKScene {
   // Check if AR nodes are added.
   var isWorldSetUp = false
 
+
   /// Set up the scene with the required nodes
   private func setUpWorld() {
     guard let currentFrame = sceneView.session.currentFrame else { return }
@@ -57,6 +58,25 @@ class GameScene: SKScene {
   override func update(_ currentTime: TimeInterval) {
     if !isWorldSetUp {
       setUpWorld()
+    }
+
+    // Retrieve current frame and light estimate from scene view.
+    guard let currentFrame = sceneView.session.currentFrame,
+      let lightEstimate = currentFrame.lightEstimate else {
+        return
+    }
+
+    // Calculate bug tint based on light levels from scene.
+    let neutralIntensity: CGFloat = 1000
+    let ambientIntensity = min(lightEstimate.ambientIntensity, neutralIntensity)
+    let blendFactor = 1 - ambientIntensity / neutralIntensity
+
+    // Tint bug using blend factor
+    for node in children {
+      if let bug = node as? SKSpriteNode {
+        bug.color = .black
+        bug.colorBlendFactor = blendFactor
+      }
     }
   }
 }
