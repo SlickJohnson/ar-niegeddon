@@ -39,6 +39,8 @@ class GameScene: SKScene {
   // Check if AR nodes are added.
   var isWorldSetUp = false
 
+  // Weapon aiming sight.
+  var sight: SKSpriteNode!
 
   /// Set up the scene with the required nodes
   private func setUpWorld() {
@@ -53,6 +55,35 @@ class GameScene: SKScene {
     sceneView.session.add(anchor: anchor)
 
     isWorldSetUp = true
+  }
+
+  override func didMove(to view: SKView) {
+    sight = SKSpriteNode(imageNamed: "sight")
+    addChild(sight)
+  }
+
+  override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+    let location = sight.position
+    let hitNodes = nodes(at: location)
+
+    var hitBug: SKNode?
+    for node in hitNodes {
+      if node.name == "bug" {
+        hitBug = node
+        break
+      }
+    }
+
+    run(Sounds.fire)
+    if let hitBug = hitBug, let anchor = sceneView.anchor(for: hitBug) {
+      let removeAction = SKAction.run {
+        self.sceneView.session.remove(anchor: anchor)
+      }
+      let group = SKAction.group([Sounds.hit, removeAction])
+      let sequence = [SKAction.wait(forDuration: 0.3), group]
+      hitBug.run(SKAction.sequence(sequence))
+    }
+
   }
 
   override func update(_ currentTime: TimeInterval) {
