@@ -45,7 +45,6 @@ class GameScene: SKScene {
   // Size of game world.
   let gameSize = CGSize(width: 2, height: 2)
 
-
   /// Set up the scene with the required nodes
   private func setUpWorld() {
     guard let currentFrame = sceneView.session.currentFrame else { return }
@@ -66,8 +65,11 @@ class GameScene: SKScene {
 
       let transform = currentFrame.camera.transform * translation
 
-      let anchor = ARAnchor(transform: transform)
-      sceneView.session.add(anchor: anchor)
+      let anchor = Anchor(transform: transform)
+      if let name = node.name, let type = NodeType(rawValue: name) {
+        anchor.type = type
+        sceneView.session.add(anchor: anchor)
+      }
     }
 
     isWorldSetUp = true
