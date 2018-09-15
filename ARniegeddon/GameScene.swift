@@ -69,6 +69,9 @@ class GameScene: SKScene {
       if let name = node.name, let type = NodeType(rawValue: name) {
         anchor.type = type
         sceneView.session.add(anchor: anchor)
+        if anchor.type == .firebug {
+          addBugSpray(to: currentFrame)
+        }
       }
     }
 
@@ -130,6 +133,17 @@ class GameScene: SKScene {
         bug.colorBlendFactor = blendFactor
       }
     }
+  }
+
+  private func addBugSpray(to currentFrame: ARFrame) {
+    var translation = matrix_identity_float4x4
+    translation.columns.3.x = Float(drand48()*2 - 1)
+    translation.columns.3.z = -Float(drand48()*2 - 1)
+    translation.columns.3.y = Float(drand48() - 0.5)
+    let transform = currentFrame.camera.transform * translation
+    let anchor = Anchor(transform: transform)
+    anchor.type = .bugspray
+    sceneView.session.add(anchor: anchor)
   }
 }
 
