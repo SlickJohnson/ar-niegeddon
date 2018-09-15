@@ -99,7 +99,8 @@ class GameScene: SKScene {
     // Check if bug was hit.
     var hitBug: SKNode?
     for node in hitNodes {
-      if node.name == "bug" {
+      if node.name == NodeType.bug.rawValue ||
+        (node.name == NodeType.firebug.rawValue) {
         hitBug = node
         break
       }
@@ -115,6 +116,8 @@ class GameScene: SKScene {
       let sequence = [SKAction.wait(forDuration: 0.3), group]
       hitBug.run(SKAction.sequence(sequence))
     }
+    
+    hasBugspray = false
   }
 
   override func update(_ currentTime: TimeInterval) {
@@ -156,8 +159,8 @@ class GameScene: SKScene {
 
   private func addBugSpray(to currentFrame: ARFrame) {
     var translation = matrix_identity_float4x4
-    translation.columns.3.x = Float(drand48()*2 - 1)
-    translation.columns.3.z = -Float(drand48()*2 - 1)
+    translation.columns.3.x = Float(drand48() * 2 - 1)
+    translation.columns.3.z = -Float(drand48() * 2 - 1)
     translation.columns.3.y = Float(drand48() - 0.5)
     let transform = currentFrame.camera.transform * translation
     let anchor = Anchor(transform: transform)
