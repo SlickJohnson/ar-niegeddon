@@ -45,6 +45,13 @@ class GameScene: SKScene {
   // Size of game world.
   let gameSize = CGSize(width: 2, height: 2)
 
+  var hasBugspray = false {
+    didSet {
+      let sightImageName = hasBugspray ? "bugspraySight" : "sight"
+      sight.texture = SKTexture(imageNamed: sightImageName)
+    }
+  }
+
   /// Set up the scene with the required nodes
   private func setUpWorld() {
     guard let currentFrame = sceneView.session.currentFrame else { return }
@@ -133,6 +140,18 @@ class GameScene: SKScene {
         bug.colorBlendFactor = blendFactor
       }
     }
+
+    //
+    for anchor in currentFrame.anchors {
+      guard let node = sceneView.node(for: anchor),
+        node.name == NodeType.bugspray.rawValue
+        else { continue }
+      let distance = simd_distance(anchor.transform.columns.3, currentFrame.camera.transform.columns.3)
+      if distance < 0.1 {
+        remove(bugspray: anchor)
+        break
+      }
+    }
   }
 
   private func addBugSpray(to currentFrame: ARFrame) {
@@ -144,6 +163,12 @@ class GameScene: SKScene {
     let anchor = Anchor(transform: transform)
     anchor.type = .bugspray
     sceneView.session.add(anchor: anchor)
+  }
+
+  private func remove(bugspray anchor: ARAnchor) {
+    run(Sounds.bugspray)
+    sceneView.session.remove(anchor: anchor)
+    hasBugspray = true
   }
 }
 
